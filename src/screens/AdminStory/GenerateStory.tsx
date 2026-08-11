@@ -62,6 +62,9 @@ export default function GenerateStory({ editItem , extraSection }: Props) {
     const [title, setTitle] = useState(editItem?.title ?? "");
     const [categoryId, setCategoryId] = useState<number | "">(editItem?.storycategory_id ?? "");
     const [isActive, setIsActive] = useState(editItem?.is_active ?? true);
+    const [coverImage, setCoverImage] = useState<File | null>(null);
+    const [coverPreview, setCoverPreview] = useState<string>(editItem?.cover_image ?? "");
+    const [coverFileName, setCoverFileName] = useState("No file chosen");
     const [pages, setPages] = useState<StoryPage[]>(() => {
         if (editItem?.media?.length) {
             return [...editItem.media]
@@ -130,10 +133,21 @@ export default function GenerateStory({ editItem , extraSection }: Props) {
         setPages((prev) => prev.map((p) => (p.id === id ? { ...p, image: file, preview: url, fileName: file.name } : p)));
     };
 
+    const handleCoverImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        createdUrlsRef.current.add(url);
+        setCoverImage(file);
+        setCoverPreview(url);
+        setCoverFileName(file.name);
+    };
+
     const handleSubmit = async () => {
         const errors: string[] = [];
         if (!title.trim()) errors.push("Story title");
         if (!categoryId) errors.push("Story category");
+        if (!isEdit && !coverImage) errors.push("Cover image");
         pages.forEach((page, i) => {
             if (!page.content.trim()) errors.push(`Page ${i + 1} text`);
             if (!isEdit && !page.image) errors.push(`Page ${i + 1} image`);
@@ -148,6 +162,7 @@ export default function GenerateStory({ editItem , extraSection }: Props) {
         formData.append("title", title.trim());
         formData.append("storycategory_id", String(categoryId));
         formData.append("is_active", String(isActive));
+        if (coverImage) formData.append("cover_image", coverImage);
 
         if (isEdit) {
             formData.append("adminstory_id", String(editItem!.adminstory_id));
@@ -277,6 +292,37 @@ export default function GenerateStory({ editItem , extraSection }: Props) {
                                     </select>
                                     <ChevronDown size={18} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500" />
                                 </div>
+                            </div>
+
+                            {/* Cover Image */}
+                            <div>
+                                <label className="block mb-2 text-[14px] font-semibold text-gray-700">
+                                    Cover Image {!isEdit && <span className="text-red-500">*</span>}
+                                </label>
+                                <div className="flex overflow-hidden rounded-[10px] border border-gray-300">
+                                    <label className="cursor-pointer border-r border-gray-300 bg-gray-100 px-4 py-2 text-xs font-medium text-[#101828] transition-colors hover:bg-gray-200 whitespace-nowrap">
+                                        Choose Image
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleCoverImageChange}
+                                        />
+                                    </label>
+                                    <span className="flex items-center px-3 text-xs text-gray-500 truncate">{coverFileName}</span>
+                                </div>
+                                {coverPreview && (
+                                    <div className="mt-3">
+                                        <Image
+                                            src={proxiedImage(coverPreview)!}
+                                            alt="Cover preview"
+                                            width={112}
+                                            height={112}
+                                            unoptimized
+                                            className="h-28 w-28 rounded-xl object-cover border border-gray-200"
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             {/* Pages */}

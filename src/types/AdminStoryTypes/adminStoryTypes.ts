@@ -35,6 +35,7 @@ export interface AdminStoryItem {
     storycategory_id: number;
     is_active: boolean;
     is_premium: boolean;
+    cover_image?: string;
     createdAt: string;
     updatedAt: string;
      original_content?: string;

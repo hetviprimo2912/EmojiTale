@@ -144,6 +144,7 @@ useEffect(() => {
                                 showCheckbox={false}
                                 columns={[
                                     { label: "ID" },
+                                    { label: "Cover Image" },
                                     { label: "Image" },
                                     { label: "Title" },
                                     { label: "Category" },
@@ -165,6 +166,21 @@ useEffect(() => {
                                             <tr key={story.adminstory_id} className="transition-all duration-200 hover:bg-[#F9FAFB]">
                                                 <td className="px-6 py-4 text-sm font-semibold text-[#101828]">
                                                     #{story.adminstory_id}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {story.cover_image ? (
+                                                        <Image
+                                                            src={proxiedImage(story.cover_image, cacheBust)!}
+                                                            alt={`${story.title} cover`}
+                                                            width={48}
+                                                            height={48}
+                                                            className="h-12 w-12 rounded-xl object-cover border border-gray-200"
+                                                        />
+                                                    ) : (
+                                                        <div className="h-12 w-12 rounded-xl border border-gray-200 bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+                                                            —
+                                                        </div>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     {firstPage ? (
@@ -234,7 +250,7 @@ useEffect(() => {
                                     })
                                 ) : (
                                     <tr>
-                                        <td colSpan={8} className="py-20">
+                                        <td colSpan={9} className="py-20">
                                             <div className="flex flex-col items-center justify-center">
                                                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#EFF6FF]">
                                                     <SearchX size={30} className="text-[#2563EB]" />
