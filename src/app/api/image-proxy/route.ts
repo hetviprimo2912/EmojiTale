@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const ALLOWED_HOSTNAMES = ["api.emotales.com"];
+const ALLOWED_HOSTNAMES = ["api.emotales.com", "cdn.emotales.com"];
 
 export async function GET(req: NextRequest) {
     const url = req.nextUrl.searchParams.get("url");
